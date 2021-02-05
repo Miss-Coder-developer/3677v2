@@ -24,6 +24,7 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('register', [AuthController::class, 'signup']);
     Route::post('login', [AuthController::class, 'login']);
     Route::put('/update-profile/{id}', [AuthController::class, 'updateUserProfile']);
+    Route::get('/user/{user_id}/destroy',[AuthController::class,'destroyUser']);
     Route::group(['middleware' => 'auth:api'], function () {
         Route::get('logout', [AuthController::class, 'logout']);
         Route::get('user', [AuthController::class, 'user']);

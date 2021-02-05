@@ -121,4 +121,11 @@ class AuthController extends Controller
             ], 401);
         }
     }
+
+    public function destroyUser($user_id){
+        User::where('id', $user_id)->delete();
+        return response()->json([
+            'message' => 'Successfully delete Profile!'
+        ], 201);
+    }
 }
