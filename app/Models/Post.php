@@ -21,7 +21,8 @@ class Post extends Model
         'photo',
         'image',
         'audio',
-        'video'
+        'video',
+        'price'
     ];
 
     /**
