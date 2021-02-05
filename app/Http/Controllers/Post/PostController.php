@@ -36,18 +36,19 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-      $validated = $request->all();
-      if ($request->hasFile('photo')) {
-        $image_path = $request->photo;
-        $filename = $image_path->getClientOriginalName();
-        $location = public_path('post');
-        $image_path->move($location, $filename);
-        $validated['photo'] = $filename;
-      }
-        try {
+//      $validated = $request->all();
 
+        try {
+            Post::upload($request);
+//            if ($request->hasFile('photo')) {
+//                $image_path = $request->photo;
+//                $filename = $image_path->getClientOriginalName();
+//                $location = public_path('post');
+//                $image_path->move($location, $filename);
+//                $validated['photo'] = $filename;
+//            }
             // Create new post
-            Post::create($validated);
+//            Post::create($validated);
             // Success response
             $response = [
                 'success' => true,
@@ -85,35 +86,36 @@ class PostController extends Controller
      */
     public function update(Request $updatePost, $id)
     {
+//        dd($updatePost);
         // dd($updatePost->title);
         // Validated data
-        $validated = $updatePost->all();
-
-        // // Find by id
-        // $post = auth()->user()->posts->where('id',$id)->first();
-        $post = Post::find($id);
-        // dd($post);
-        $post->title = $updatePost->title;
-        $post->description = $updatePost->description;
-        $post->status = $updatePost->status;
-        // Unlink old photo if exist new photo
-        if ($post['photo']){
-            $oldPhoto = public_path('/post/'.$post->photo);
-            if (file_exists($oldPhoto))
-            {
-                unlink($oldPhoto);
-            }
-            // $validated['photo'] = $validated['photo']->store("{$this->photoDir}", 'post');
-            $image_path = $validated->photo;
-            $filename = $image_path->getClientOriginalName();
-            $location = public_path('post');
-            $image_path->move($location, $filename);
-            $validated['photo'] = $filename;
-        }
+//        $validated = $updatePost->all();
+//
+//        // // Find by id
+//        // $post = auth()->user()->posts->where('id',$id)->first();
+//        $post = Post::find($id);
+//        // dd($post);
+//        $post->title = $updatePost->title;
+//        $post->description = $updatePost->description;
+//        $post->status = $updatePost->status;
+//        // Unlink old photo if exist new photo
+//        if ($post['photo']){
+//            $oldPhoto = public_path('/post/'.$post->photo);
+//            if (file_exists($oldPhoto))
+//            {
+//                unlink($oldPhoto);
+//            }
+//            // $validated['photo'] = $validated['photo']->store("{$this->photoDir}", 'post');
+//            $image_path = $validated->photo;
+//            $filename = $image_path->getClientOriginalName();
+//            $location = public_path('post');
+//            $image_path->move($location, $filename);
+//            $validated['photo'] = $filename;
+//        }
 
         try {
             // Update existing post
-            $post->update($validated);
+            Post::updateFiles($updatePost, $id);
 
             // Success response
             $response = [
@@ -137,11 +139,11 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        Post::where('id',$id)->delete();
+        Post::destroyFiles($id);
     }
 
     public function likepost(Request $request){
-        
+
         $post_id = $request->post_id;
         $isLike = $request->isLike === 'true';
         $update = false;
@@ -170,7 +172,7 @@ class PostController extends Controller
         $like->isLike = $isLike;
         $like->user_id = 1;
         $like->post_id = $post->id;
-        
+
         if($update){
             $like->update();
         }

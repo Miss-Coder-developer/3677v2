@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
-use App\User;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class PostComment extends Model
 {
-    protected $table = 'post_comments';
+    protected $table = 'comments';
 
     protected $fillable = [
         'user_id',
         'post_id',
-        'text'
+        'parent_id',
+        'comment'
     ];
 
     /**
@@ -23,6 +24,9 @@ class PostComment extends Model
         return $this->belongsTo(Post::class,'post_id','id');
     }
 
+    public function reply(){
+        return $this->hasMany(Comment::class, 'id','post_id');
+    }
     /**
      * Get the post that owns the comment.
      */

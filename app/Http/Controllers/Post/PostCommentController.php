@@ -1,14 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Api\Post;
+namespace App\Http\Controllers\Post;
 //namespace App\Http\Controllers\Post;
 
 use App\Http\Controllers\Controller;
 //use App\Http\Requests\Post\StorePostComment;
 //use App\Http\Requests\Post\UpdatePostComment;
+use App\Http\Requests\StorePostCommentRequest;
+use App\Models\Post;
 use App\Models\PostComment;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class PostCommentController extends Controller
@@ -26,15 +29,17 @@ class PostCommentController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * @param StorePostComment $request
+     * @param StorePostCommentRequest $request
      * @return JsonResponse
      */
-    public function store(StorePostComment $request)
+    public function store(Request $request, $id)
     {
+//        dd($request->all());
         try {
             // Create Post comment
-            $request['user_id'] = auth()->user()->id;
-            PostComment::create($request->toArray());
+            $request['user_id'] = 1;
+            $request['post_id'] =  $id;
+            PostComment::create($request->all());
 
             // Success response
             $response = [
@@ -58,7 +63,7 @@ class PostCommentController extends Controller
      */
     public function show($id)
     {
-        //
+
     }
 
     /**
@@ -97,7 +102,13 @@ class PostCommentController extends Controller
      * @return Response
      */
     public function destroy($id)
-    {
+    {}
 
+    public function reply(Request $request, PostComment $post, $post_id, $parent_id){
+//        dd($parent_id);
+        $request['post_id'] = $post_id;
+        $request['user_id'] = 1;
+        $request['parent_id'] = $parent_id;
+        PostComment::create($request->all());
     }
 }

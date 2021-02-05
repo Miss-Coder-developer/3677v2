@@ -10,22 +10,33 @@ class AuthController extends Controller
 {
     public function signup(Request $request)
     {
+
         $request->validate([
             'name' => 'required|string',
             'surname' => 'required|string',
             'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|confirmed'
+            'password' => 'required|string|confirmed',
+            'interested_category' => 'string'
         ]);
+
         $user = new User([
             'name' => $request->name,
             'surname' => $request->surname,
             'email' => $request->email,
-            'password' => bcrypt($request->password)
+            'password' => bcrypt($request->password),
+            'interested_categroy' => $request->interested_category
         ]);
-        $user->save();
-        return response()->json([
-            'message' => 'Successfully created user!'
-        ], 201);
+
+        try{
+            $user->save();
+            return response()->json([
+                'message' => 'Successfully created user!'
+            ], 201);
+        }catch (\Exception $exception){
+            return response()->json([
+                'message' => 'Error'
+            ], 401);
+        }
     }
 
     public function login(Request $request)
@@ -76,5 +87,38 @@ class AuthController extends Controller
     public function user(Request $request)
     {
         return response()->json($request->user());
+    }
+
+    public function updateUserProfile(Request $request, $id){
+
+//        $data = $request->all();
+
+        $request->validate([
+            'name' => 'required|string',
+            'surname' => 'required|string',
+            'email' => 'required|string|email|unique:users',
+            'password' => 'required|string',
+            'interested_category' => 'string',
+            'nickname' => 'string'
+        ]);
+//        dd('jhjkhj');
+        try{
+            User::where('id', $id)->update([
+                'name' => $request->name,
+                'surname' => $request->surname,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'interested_category' => $request->interested_category,
+                'nickname' => $request->nickname
+            ]);
+            return response()->json([
+                'message' => 'Successfully updated Profile!'
+            ], 201);
+
+        }catch (\Exception $e){
+            return response()->json([
+                'message' => 'Error'
+            ], 401);
+        }
     }
 }
