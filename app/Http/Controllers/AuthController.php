@@ -6,12 +6,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Validator;
 class AuthController extends Controller
 {
     public function signup(Request $request)
     {
 
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'surname' => 'required|string',
             'email' => 'required|string|email|unique:users',
@@ -19,6 +20,10 @@ class AuthController extends Controller
             'password_confirmation' => 'required|string|same:password',
             'interested_category' => 'string'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 401);
+        }
 
         $user = new User([
             'name' => $request->name,
@@ -42,11 +47,15 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required|string|email',
             'password' => 'required|string',
             'remember_me' => 'boolean'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 401);
+        }
         $credentials = request(['email', 'password']);
         if(!Auth::attempt($credentials))
             return response()->json([
